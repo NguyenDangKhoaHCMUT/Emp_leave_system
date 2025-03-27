@@ -5,8 +5,7 @@ import { orange, teal, cyan, grey } from '@mui/material/colors'
 // Dung extendTheme thay cho createTheme de tranh truong hop bi loi nhap nhay (bug flickering)
 const theme = createTheme ({
   trello:{
-    appBarHeight: 58,
-    boardBarHeight: 60
+    appBarHeight: 65,
   },
   cssVariables: {
     colorSchemeSelector: 'class'

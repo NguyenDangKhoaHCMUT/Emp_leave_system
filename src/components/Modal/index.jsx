@@ -6,7 +6,7 @@ import { Modal as BaseModal } from '@mui/base/Modal';
 import Content from './Content';
 import { red } from '@mui/material/colors';
 
-export default function index() {
+export default function index({ title}) {
   const [open, setOpen] = React.useState(false);
   const handleOpen = () => setOpen(true);
   const handleClose = () => setOpen(false);
@@ -14,7 +14,7 @@ export default function index() {
   return (
     <div>
       <TriggerButton type="button" onClick={handleOpen} sx={{ backgroundColor: 'primary.main', color: 'white' }}>
-        Open modal
+        {title}
       </TriggerButton>
       <Modal
         aria-labelledby="unstyled-modal-title"
@@ -23,7 +23,7 @@ export default function index() {
         onClose={handleClose}
         slots={{ backdrop: StyledBackdrop }}
       >
-        <ModalContent sx={{ width: 800 }}>
+        <ModalContent sx={{ width: 850 }}>
           <Content />
         </ModalContent>
       </Modal>

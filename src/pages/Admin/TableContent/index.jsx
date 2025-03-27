@@ -9,6 +9,7 @@ import TablePagination from '@mui/material/TablePagination';
 import TableRow from '@mui/material/TableRow';
 
 import ButtonAction from './ButtonAction';
+import Modal from '~/components/Modal';
 
 const columns = [
   { id: 'from', label: 'From', minWidth: 170 },
@@ -21,30 +22,30 @@ const columns = [
     minWidth: 170,
   },
   {
-    id: 'approver',
-    label: 'Appover',
+    id: 'employee',
+    label: 'Employee',
     minWidth: 170,
   },
   {
-    id: 'action',
-    label: 'Action',
+    id: 'details',
+    label: 'Details',
     minWidth: 170,
     align: 'right',
   },
 ];
 
-function createData(from, to, days, status, reason, approver, action) {
-  return { from, to, days, status, reason, approver, action };
+function createData(from, to, days, status, reason, employee, details) {
+  return { from, to, days, status, reason, employee, details };
 }
 
 const rows = [
-  createData('31 Dec 2024', '31 Dec 2024', 1, 'Pending', 'Sick', 'Admin', <ButtonAction />),
-  createData('31 Dec 2024', '31 Dec 2024', 1, 'Reject', 'Sick', 'Admin', ''),
-  createData('31 Dec 2024', '31 Dec 2024', 1, 'Approved', 'Sick', 'Admin', ''),
-  createData('31 Dec 2024', '31 Dec 2024', 1, 'Pending', 'Sick', 'Admin', ''),
-  createData('31 Dec 2024', '31 Dec 2024', 1, 'Pending', 'Sick', 'Admin', ''),
-  createData('31 Dec 2024', '31 Dec 2024', 1, 'Pending', 'Sick', 'Admin', ''),
-  createData('31 Dec 2024', '31 Dec 2024', 1, 'Pending', 'Sick', 'Admin', ''),
+  createData('31 Dec 2024', '31 Dec 2024', 1, 'Pending', 'Sick', 'Admin', <Modal title={<ButtonAction />}/>),
+  createData('31 Dec 2024', '31 Dec 2024', 1, 'Reject', 'Sick', 'Admin', <Modal title={<ButtonAction />}/>),
+  createData('31 Dec 2024', '31 Dec 2024', 1, 'Approved', 'Sick', 'Admin', <Modal title={<ButtonAction />}/>),
+  createData('31 Dec 2024', '31 Dec 2024', 1, 'Pending', 'Sick', 'Admin', <Modal title={<ButtonAction />}/>),
+  createData('31 Dec 2024', '31 Dec 2024', 1, 'Pending', 'Sick', 'Admin', <Modal title={<ButtonAction />}/>),
+  createData('31 Dec 2024', '31 Dec 2024', 1, 'Pending', 'Sick', 'Admin', <Modal title={<ButtonAction />}/>),
+  createData('31 Dec 2024', '31 Dec 2024', 1, 'Pending', 'Sick', 'Admin', <Modal title={<ButtonAction />}/>),
 ];
 
 export default function index() {

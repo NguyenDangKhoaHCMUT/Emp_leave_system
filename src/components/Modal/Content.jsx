@@ -1,6 +1,5 @@
 import Box from '@mui/material/Box'
 import { Typography, Button } from '@mui/material'
-import UploadFile from '~/components/UploadFile'
 import TextField from '@mui/material/TextField';
 import { DemoContainer } from '@mui/x-date-pickers/internals/demo';
 import { AdapterDayjs } from '@mui/x-date-pickers/AdapterDayjs';
@@ -21,7 +20,7 @@ function Content() {
         padding: 2,
         color: 'white',
       }}>
-        <Typography variant='h6' sx={{ fontWeight: 'bold'}}>Apply leave</Typography>
+        <Typography variant='h6' sx={{ fontWeight: 'bold'}}>Detail leave</Typography>
       </Box>
       <Box sx={{
         width: '100%',
@@ -66,6 +65,29 @@ function Content() {
           width: '100%',
         }}>
           <Box sx={{ width: '20%' }}>
+            <Typography variant='h6'>Employee</Typography>
+          </Box>
+          <Box
+            component="form"
+            sx={{
+              width: '40%',
+              '& .MuiTextField-root': { width: '100%' },
+              overflow: 'auto',
+            }}
+            noValidate
+            autoComplete="off"
+          >
+            <div>
+            <TextField id="outlined-basic" variant="outlined" />
+            </div>
+          </Box>
+        </Box>
+        <Box sx={{ 
+          mt: 2,
+          display: 'flex', 
+          width: '100%',
+        }}>
+          <Box sx={{ width: '20%' }}>
             <Typography variant='h6'>Reason</Typography>
           </Box>
           <Box
@@ -87,8 +109,32 @@ function Content() {
             </div>
           </Box>
         </Box>
-        <Box sx={{ mt: 2, justifyContent: 'flex-end', display: 'flex' }}>
-          <UploadFile />
+        <Box sx={{ 
+          mt: 2,
+          display: 'flex', 
+          width: '100%',
+        }}>
+          <Box sx={{ width: '20%' }}>
+            <Typography variant='h6'>Feedback</Typography>
+          </Box>
+          <Box
+            component="form"
+            sx={{
+              width: '80%',
+              '& .MuiTextField-root': { width: '100%' },
+              overflow: 'auto',
+            }}
+            noValidate
+            autoComplete="off"
+          >
+            <div>
+              <TextField
+                id="outlined-multiline-flexible"
+                multiline
+                maxRows={4}
+              />
+            </div>
+          </Box>
         </Box>
       </Box>
       <Box sx={{
@@ -101,8 +147,9 @@ function Content() {
         justifyContent: 'flex-end',
         gap: 3
       }}>
+        <Button variant="contained">Approve</Button>
+        <Button variant="contained" color="error">Reject</Button>
         <Button variant="outlined">Cancel</Button>
-        <Button variant="contained">Apply</Button>
       </Box>
     </Box>
   )
