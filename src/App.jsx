@@ -1,17 +1,36 @@
 import Home from "~/pages/Home";
 import Admin from "~/pages/Admin";
 import Layout from "~/pages/Layout";
+import Login from "~/pages/Login";
 import { BrowserRouter, Routes, Route } from "react-router-dom";
+import { AuthProvider } from "./context/AuthContext";
+import { AdminRoute, UserRoute, PublicRoute } from "./components/ProtectedRoute/ProtectedRoute";
+
 function App() {
   return (
-    <BrowserRouter>
-      <Routes>
-        <Route exact path="/" element={<Layout />}>
-          <Route exact path="/" element={<Home />} />
-          <Route exact path="/admin" element={<Admin />} />
-        </Route>
-      </Routes>
-    </BrowserRouter>
+    <AuthProvider>
+      <BrowserRouter>
+        <Routes>
+          <Route path="/login" element={
+            <PublicRoute>
+              <Login />
+            </PublicRoute>
+          } />
+          <Route path="/" element={<Layout />}>
+            <Route path="/" element={
+              <UserRoute>
+                <Home />
+              </UserRoute>
+            } />
+            <Route path="/admin" element={
+              <AdminRoute>
+                <Admin />
+              </AdminRoute>
+            } />
+          </Route>
+        </Routes>
+      </BrowserRouter>
+    </AuthProvider>
   );
 }
 

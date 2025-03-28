@@ -1,17 +1,11 @@
 import ModeSelect from '~/components/ModeSelect'
 import Box from '@mui/material/Box'
 import AppsIcon from '@mui/icons-material/Apps'
-import SvgIcon from '@mui/material/SvgIcon'
-// import { ReactComponent as TrelloIcon } from '~/assets/trello.svg'
 import Typography from '@mui/material/Typography'
-
-import TextField from '@mui/material/TextField'
 import Badge from '@mui/material/Badge'
 import NotificationsNoneIcon from '@mui/icons-material/NotificationsNone'
 import Tooltip from '@mui/material/Tooltip'
-import HelpOutlineIcon from '@mui/icons-material/HelpOutline'
 import Profiles from './Profiles'
-
 
 function index() {
   return (
@@ -21,27 +15,64 @@ function index() {
       display: 'flex',
       alignItems: 'center',
       justifyContent: 'space-between',
+      px: { xs: 4, sm: 8 }, // Increased horizontal padding
       gap: 2,
-      overflowX: 'auto'
+      overflowX: 'auto',
+      bgcolor: (theme) => theme.palette.background.paper,
+      borderBottom: '1px solid',
+      borderColor: 'divider'
     }}>
-      <Box sx={{ display: 'flex', alignItems: 'center', gap: 2 }}>
-        <AppsIcon sx={{ color: 'primary.main' }}/>
-        <Box sx={{ display: 'flex', alignItems: 'center', gap: 0.5 }}>
-          {/* <SvgIcon component={TrelloIcon} fontSize='small' inheritViewBox sx={{ color: 'primary.main' }}/> */}
-          <Typography variant='span' sx={{ fontSize: '1.2rem', fontWeight: 'bold', color: 'primary.main' }}>ELS</Typography>
+      <Box sx={{ 
+        display: 'flex', 
+        alignItems: 'center',
+        gap: { xs: 2, sm: 3 }, // Adjusted gap
+        flex: '1 1 auto' // Allow box to grow and take available space
+      }}>
+        <AppsIcon sx={{ 
+          color: 'primary.main',
+          fontSize: { xs: '24px', sm: '28px' }
+        }}/>
+        <Box sx={{ 
+          display: 'flex', 
+          alignItems: 'center', 
+          gap: 0 
+        }}>
+          <Typography 
+            variant='h6' 
+            sx={{ 
+              fontSize: { xs: '1rem', sm: '1.2rem' }, 
+              fontWeight: 'bold', 
+              color: 'primary.main',
+              display: { xs: 'none', sm: 'block' }
+            }}
+          >
+            Employee Leave Management
+          </Typography>
+          <Typography 
+            variant='h6' 
+            sx={{ 
+              fontSize: { xs: '1rem', sm: '1.2rem' }, 
+              fontWeight: 'bold', 
+              color: 'primary.main',
+              display: { xs: 'block', sm: 'none' }
+            }}
+          >
+            ELS
+          </Typography>
         </Box>
       </Box>
 
-      <Box sx={{ display: 'flex', alignItems: 'center', gap: 2 }}>
-        <TextField id="outlined-search" label="Search..." type="search" size='small' sx={{ minWidth: 120 }}/>
+      <Box sx={{ 
+        display: 'flex', 
+        alignItems: 'center', 
+        gap: { xs: 2, sm: 3 }, // Increased gap between right elements
+        ml: 'auto' // Push to the right
+      }}>
         <ModeSelect />
         <Tooltip title="Notifications">
           <Badge color="secondary" variant="dot" sx={{ cursor: 'pointer' }}>
             <NotificationsNoneIcon sx={{ color: 'primary.main' }}/>
           </Badge>
-        </Tooltip>
-        <Tooltip title="Help">
-          <HelpOutlineIcon sx={{ cursor: 'pointer', color: 'primary.main' }}/>
         </Tooltip>
         <Profiles />
       </Box>
