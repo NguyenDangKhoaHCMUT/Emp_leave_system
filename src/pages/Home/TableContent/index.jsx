@@ -1,4 +1,5 @@
-import * as React from 'react';
+import React, { useEffect, useState } from 'react';
+import { useAuth } from '~/context/AuthContext';
 import Paper from '@mui/material/Paper';
 import Table from '@mui/material/Table';
 import TableBody from '@mui/material/TableBody';
@@ -7,6 +8,7 @@ import TableContainer from '@mui/material/TableContainer';
 import TableHead from '@mui/material/TableHead';
 import TablePagination from '@mui/material/TablePagination';
 import TableRow from '@mui/material/TableRow';
+import { getAllLeaveRequests } from '~/services/apiService';
 
 import ButtonAction from './ButtonAction';
 
@@ -15,41 +17,44 @@ const columns = [
   { id: 'to', label: 'To', minWidth: 170 },
   { id: 'days', label: 'Days', minWidth: 50 },
   { id: 'status', label: 'Status', minWidth: 170 },
-  {
-    id: 'reason',
-    label: 'Reason',
-    minWidth: 170,
-  },
-  {
-    id: 'approver',
-    label: 'Appover',
-    minWidth: 170,
-  },
-  {
-    id: 'action',
-    label: 'Action',
-    minWidth: 170,
-    align: 'right',
-  },
+  { id: 'reason', label: 'Reason', minWidth: 170 },
+  { id: 'action', label: 'Action', minWidth: 170, align: 'right' },
 ];
 
-function createData(from, to, days, status, reason, approver, action) {
-  return { from, to, days, status, reason, approver, action };
-}
+export default function Index() {
+  const { user } = useAuth();
+  const [rows, setRows] = useState([]);
+  const [page, setPage] = useState(0);
+  const [rowsPerPage, setRowsPerPage] = useState(5);
+  const [refreshData, setRefreshData] = useState(0);
 
-const rows = [
-  createData('31 Dec 2024', '31 Dec 2024', 1, 'Pending', 'Sick', 'Admin', <ButtonAction />),
-  createData('31 Dec 2024', '31 Dec 2024', 1, 'Reject', 'Sick', 'Admin', ''),
-  createData('31 Dec 2024', '31 Dec 2024', 1, 'Approved', 'Sick', 'Admin', ''),
-  createData('31 Dec 2024', '31 Dec 2024', 1, 'Pending', 'Sick', 'Admin', ''),
-  createData('31 Dec 2024', '31 Dec 2024', 1, 'Pending', 'Sick', 'Admin', ''),
-  createData('31 Dec 2024', '31 Dec 2024', 1, 'Pending', 'Sick', 'Admin', ''),
-  createData('31 Dec 2024', '31 Dec 2024', 1, 'Pending', 'Sick', 'Admin', ''),
-];
+  const refreshTable = () => {
+    setRefreshData(prev => prev + 1);
+  };
 
-export default function index() {
-  const [page, setPage] = React.useState(0);
-  const [rowsPerPage, setRowsPerPage] = React.useState(5);
+  useEffect(() => {
+    const fetchData = async () => {
+      try {
+        const token = user.token;
+        const response = await getAllLeaveRequests(token);
+        const data = response.data.map((item) => {
+          return {
+            from: item.startDate,
+            to: item.endDate,
+            days: Math.ceil((new Date(item.endDate) - new Date(item.startDate)) / (1000 * 60 * 60 * 24)),
+            status: item.status,
+            reason: item.reason,
+            action: <ButtonAction status={item.status} id={item.id} refreshTable={refreshTable} />,
+          };
+        });
+        setRows(data);
+      } catch (error) {
+        console.error('Error fetching leave requests:', error);
+      }
+    };
+
+    fetchData();
+  }, [user, refreshData]);
 
   const handleChangePage = (event, newPage) => {
     setPage(newPage);
@@ -61,9 +66,7 @@ export default function index() {
   };
 
   return (
-    <Paper sx={{ 
-      width: '100%',
-    }}>
+    <Paper sx={{ width: '100%' }}>
       <TableContainer sx={{ maxHeight: '90%' }}>
         <Table>
           <TableHead>
@@ -82,24 +85,18 @@ export default function index() {
           <TableBody>
             {rows
               .slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage)
-              .map((row) => {
-                return (
-                  <TableRow hover role="checkbox" tabIndex={-1} key={row.code}>
-                    {columns.map((column) => {
-                      const value = row[column.id];
-                      return (
-                        <>
-                          <TableCell key={column.id} align={column.align}>
-                            {column.format && typeof value === 'number'
-                              ? column.format(value)
-                              : value}
-                          </TableCell>
-                        </>
-                      );
-                    })}
-                  </TableRow>
-                );
-              })}
+              .map((row, index) => (
+                <TableRow hover role="checkbox" tabIndex={-1} key={index}>
+                  {columns.map((column) => {
+                    const value = row[column.id];
+                    return (
+                      <TableCell key={column.id} align={column.align}>
+                        {value}
+                      </TableCell>
+                    );
+                  })}
+                </TableRow>
+              ))}
           </TableBody>
         </Table>
       </TableContainer>
