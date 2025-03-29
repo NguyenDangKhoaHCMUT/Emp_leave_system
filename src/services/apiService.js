@@ -20,6 +20,24 @@ const getAllLeaveRequests = async (token) => {
         headers: {
             Authorization: `Bearer ${token}`,
         },
+    })
+    return response;
+}
+
+const declineRequest = async (id, token) => {
+    const response = await axios.post(`/leave-requests/${id}/decline`, null, {
+        headers: {
+            Authorization: `Bearer ${token}`,
+        },
+    });
+    return response;
+}
+
+const approveRequest = async (id, token) => {
+    const response = await axios.post(`/leave-requests/${id}/approve`, null, {
+        headers: {
+            Authorization: `Bearer ${token}`,
+        },
     });
     return response;
 }
@@ -53,10 +71,13 @@ const deleteLeaveRequest = async (token, id) => {
     // console.log(id);
 }
 
-export { 
+export {
     postLogin,
     getUserProfile,
+    declineRequest,
+    approveRequest,
     getAllLeaveRequests,
     createLeaveRequest,
     deleteLeaveRequest
-};
+}
+
