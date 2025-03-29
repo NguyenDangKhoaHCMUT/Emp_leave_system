@@ -9,6 +9,7 @@ import { AdapterDayjs } from '@mui/x-date-pickers/AdapterDayjs';
 import { LocalizationProvider } from '@mui/x-date-pickers/LocalizationProvider';
 import { DatePicker } from '@mui/x-date-pickers/DatePicker';
 import { useAuth } from '~/context/AuthContext';
+import { approveRequest, declineRequest } from '~/services/apiService'; // Added missing imports
 import dayjs from 'dayjs';
 
 // Backdrop component
@@ -105,30 +106,54 @@ const ModalContent = styled('div')(
 // Main component
 export default function ModalUpdate({ rowData, open, onClose, onUpdateSuccess }) {
   const { user } = useAuth();
-  const [feedback, setFeedback] = React.useState(rowData?.feedback || '');
-  const [status, setStatus] = React.useState(rowData?.status || 'Pending');
+  // Initialize state using useEffect to handle prop changes
+  const [feedback, setFeedback] = React.useState('');
+  const [status, setStatus] = React.useState('');
+  const [isSubmitting, setIsSubmitting] = React.useState(false);
+  
+  // Update state when rowData changes
+  React.useEffect(() => {
+    if (rowData) {
+      setFeedback(rowData.feedback || '');
+      setStatus(rowData.status || 'PENDING');
+    }
+  }, [rowData]);
 
   // Handle form submission - only handle approve/reject actions
   const handleSubmit = async (action) => {
     try {
-      // Here you would add your API call to update the leave request status
-      // Example API call structure:
-      // const response = await updateLeaveStatus(user.token, {
-      //   id: rowData.id,
-      //   feedback,
-      //   status: action === 'approve' ? 'Approved' : 'Rejected'
-      // });
+      setIsSubmitting(true);
+      let response;
       
-      console.log('Processing request with action:', action);
-      console.log('Feedback:', feedback);
+      if (action === 'approve') {
+        // Call the approve API endpoint
+        response = await approveRequest(rowData.id, user.token);
+        console.log('Approving request:', rowData.id);
+      } else if (action === 'reject') {
+        // Call the decline API endpoint
+        response = await declineRequest(rowData.id, user.token);
+        console.log('Rejecting request:', rowData.id);
+      }
+      
+      console.log('Response:', response);
       
       // If successful
-      if (onUpdateSuccess) {
-        onUpdateSuccess();
+      if (response && response.status === 200) {
+        // Update the status locally 
+        setStatus(action === 'approve' ? 'APPROVED' : 'REJECTED');
+        
+        // Call the success callback
+        if (onUpdateSuccess) {
+          onUpdateSuccess();
+        }
+        
+        // Optional: Close the modal
+        // onClose();
       }
-      onClose();
     } catch (error) {
       console.error('Error updating leave request:', error);
+    } finally {
+      setIsSubmitting(false);
     }
   };
 
@@ -179,14 +204,14 @@ export default function ModalUpdate({ rowData, open, onClose, onUpdateSuccess })
                   <DemoContainer components={['DatePicker']} sx={{ width: '40%' }}>
                     <DatePicker 
                       label="From" 
-                      value={dayjs(rowData?.startDate)}
+                      value={rowData?.startDate ? dayjs(rowData.startDate) : null}
                       readOnly
                     />
                   </DemoContainer>
                   <DemoContainer components={['DatePicker']} sx={{ width: '40%' }}>
                     <DatePicker 
                       label="To" 
-                      value={dayjs(rowData?.endDate)}
+                      value={rowData?.endDate ? dayjs(rowData.endDate) : null}
                       readOnly
                     />
                   </DemoContainer>
@@ -262,8 +287,8 @@ export default function ModalUpdate({ rowData, open, onClose, onUpdateSuccess })
               </Box>
             </Box>
             
-            {/* Feedback Section - Only this can be edited */}
-            <Box sx={{ 
+            {/* Feedback Section - Only this can be edited when status is PENDING */}
+            {/* <Box sx={{ 
               mt: 2,
               display: 'flex', 
               width: '100%',
@@ -286,10 +311,10 @@ export default function ModalUpdate({ rowData, open, onClose, onUpdateSuccess })
                   value={feedback}
                   onChange={(e) => setFeedback(e.target.value)}
                   placeholder="Enter your feedback for this request"
-                  disabled={status !== 'Pending'}
+                  disabled={status !== 'PENDING'}
                 />
               </Box>
-            </Box>
+            </Box> */}
 
             {/* Status Section */}
             <Box sx={{ 
@@ -305,8 +330,8 @@ export default function ModalUpdate({ rowData, open, onClose, onUpdateSuccess })
                   variant='subtitle1' 
                   sx={{ 
                     fontWeight: 'bold', 
-                    color: status === 'Approved' ? 'success.main' : 
-                           status === 'Rejected' ? 'error.main' : 'warning.main'
+                    color: status === 'APPROVED' ? 'success.main' : 
+                           status === 'REJECTED' ? 'error.main' : 'warning.main'
                   }}
                 >
                   {status}
@@ -324,21 +349,23 @@ export default function ModalUpdate({ rowData, open, onClose, onUpdateSuccess })
             justifyContent: 'flex-end',
             gap: 3
           }}>
-            {user.role === 'admin' && rowData?.status === 'Pending' && (
+            {user.role === 'admin' && status === 'PENDING' && (
               <>
                 <Button 
                   variant="contained" 
                   color="success" 
                   onClick={() => handleSubmit('approve')}
+                  disabled={isSubmitting}
                 >
-                  Approve
+                  {isSubmitting ? 'Processing...' : 'Approve'}
                 </Button>
                 <Button 
                   variant="contained" 
                   color="error" 
                   onClick={() => handleSubmit('reject')}
+                  disabled={isSubmitting}
                 >
-                  Reject
+                  {isSubmitting ? 'Processing...' : 'Reject'}
                 </Button>
               </>
             )}

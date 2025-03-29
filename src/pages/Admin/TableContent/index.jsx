@@ -7,7 +7,7 @@ import TableContainer from '@mui/material/TableContainer';
 import TableHead from '@mui/material/TableHead';
 import TablePagination from '@mui/material/TablePagination';
 import TableRow from '@mui/material/TableRow';
-import { Button } from '@mui/material';
+import { Button, Chip } from '@mui/material';
 import { getAllListRequest } from '~/services/apiService';
 import { useAuth } from '~/context/AuthContext';
 import ButtonAction from './ButtonAction';
@@ -22,9 +22,23 @@ const columns = [
   { id: 'reason', label: 'Reason', align: 'left' },
   { id: 'status', label: 'Status', align: 'left' },
   { id: 'idUserSend', label: 'Requester ID', align: 'right' },
-  { id: 'idUserReceive', label: 'Approver ID', align: 'right' },
+  // { id: 'idUserReceive', label: 'Approver ID', align: 'right' },
   { id: 'details', label: 'Details', align: 'right' },
 ];
+
+// Function to get status chip color
+const getStatusColor = (status) => {
+  switch(status) {
+    case 'APPROVED':
+      return 'success';
+    case 'REJECTED':
+      return 'error';
+    case 'PENDING':
+      return 'warning';
+    default:
+      return 'default';
+  }
+};
 
 export default function index() {
   const [page, setPage] = React.useState(0);
@@ -33,7 +47,7 @@ export default function index() {
   const [selectedRow, setSelectedRow] = React.useState(null);
   const [modalOpen, setModalOpen] = React.useState(false);
   const { user } = useAuth();
-
+  
   // Fetch data
   React.useEffect(() => {
     const fetchData = async () => {
@@ -46,30 +60,30 @@ export default function index() {
     };
     fetchData();
   }, [user.token]);
-
+  
   // Handle page change
   const handleChangePage = (event, newPage) => {
     setPage(newPage);
   };
-
+  
   // Handle rows per page change
   const handleChangeRowsPerPage = (event) => {
     setRowsPerPage(+event.target.value);
     setPage(0);
   };
-
+  
   // Handle opening the modal with row data
   const handleOpenModal = (rowData) => {
     setSelectedRow(rowData);
     setModalOpen(true);
   };
-
+  
   // Handle closing the modal
   const handleCloseModal = () => {
     setModalOpen(false);
     setSelectedRow(null);
   };
-
+  
   // Handle successful update
   const handleUpdateSuccess = () => {
     // Refresh data after successful update
@@ -117,6 +131,13 @@ export default function index() {
                           >
                             <ButtonAction />
                           </Button>
+                        ) : column.id === 'status' ? (
+                          <Chip
+                            label={value || '-'}
+                            color={getStatusColor(value)}
+                            size="small"
+                            sx={{ fontWeight: 'bold' }}
+                          />
                         ) : column.id.includes('Date') || column.id.includes('At') ? (
                           value ? new Date(value).toLocaleDateString() : '-'
                         ) : (
