@@ -71,6 +71,20 @@ const deleteLeaveRequest = async (token, id) => {
     // console.log(id);
 }
 
+const getAttachment = async (token, id) => {
+    try {
+        const response = await axios.get(`/leave-requests/${id}/attachments`, {
+            headers: {
+                Authorization: `Bearer ${token}`,
+            },
+        });
+        return response;
+    } catch (error) {
+        console.error("Error getting attachment:", error);
+        throw error;
+    }
+}
+
 export {
     postLogin,
     getUserProfile,
@@ -78,6 +92,7 @@ export {
     approveRequest,
     getAllLeaveRequests,
     createLeaveRequest,
-    deleteLeaveRequest
+    deleteLeaveRequest,
+    getAttachment,
 }
 

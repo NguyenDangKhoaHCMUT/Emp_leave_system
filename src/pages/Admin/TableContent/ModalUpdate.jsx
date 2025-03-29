@@ -9,7 +9,8 @@ import { AdapterDayjs } from '@mui/x-date-pickers/AdapterDayjs';
 import { LocalizationProvider } from '@mui/x-date-pickers/LocalizationProvider';
 import { DatePicker } from '@mui/x-date-pickers/DatePicker';
 import { useAuth } from '~/context/AuthContext';
-import { approveRequest, declineRequest } from '~/services/apiService'; // Added missing imports
+import { approveRequest, declineRequest, getAttachment } from '~/services/apiService';
+import CloudUploadIcon from '@mui/icons-material/CloudUpload';
 import dayjs from 'dayjs';
 
 // Backdrop component
@@ -104,278 +105,320 @@ const ModalContent = styled('div')(
 );
 
 // Main component
+// Main component
 export default function ModalUpdate({ rowData, open, onClose, onUpdateSuccess }) {
-  const { user } = useAuth();
-  // Initialize state using useEffect to handle prop changes
-  const [feedback, setFeedback] = React.useState('');
-  const [status, setStatus] = React.useState('');
-  const [isSubmitting, setIsSubmitting] = React.useState(false);
-  
-  // Update state when rowData changes
-  React.useEffect(() => {
-    if (rowData) {
-      setFeedback(rowData.feedback || '');
-      setStatus(rowData.status || 'PENDING');
-    }
-  }, [rowData]);
-
-  // Handle form submission - only handle approve/reject actions
-  const handleSubmit = async (action) => {
-    try {
-      setIsSubmitting(true);
-      let response;
-      
-      if (action === 'approve') {
-        // Call the approve API endpoint
-        response = await approveRequest(rowData.id, user.token);
-        console.log('Approving request:', rowData.id);
-      } else if (action === 'reject') {
-        // Call the decline API endpoint
-        response = await declineRequest(rowData.id, user.token);
-        console.log('Rejecting request:', rowData.id);
-      }
-      
-      console.log('Response:', response);
-      
-      // If successful
-      if (response && response.status === 200) {
-        // Update the status locally 
-        setStatus(action === 'approve' ? 'APPROVED' : 'REJECTED');
+    const { user } = useAuth();
+    // Initialize state using useEffect to handle prop changes
+    const [feedback, setFeedback] = React.useState('');
+    const [status, setStatus] = React.useState('');
+    const [isSubmitting, setIsSubmitting] = React.useState(false);
+    const [attachment, setAttachment] = React.useState(null);
+    const [isLoadingAttachment, setIsLoadingAttachment] = React.useState(false);
+    
+    // Update state when rowData changes and fetch attachment
+    React.useEffect(() => {
+      if (rowData) {
+        setFeedback(rowData.feedback || '');
+        setStatus(rowData.status || 'PENDING');
         
-        // Call the success callback
-        if (onUpdateSuccess) {
-          onUpdateSuccess();
+        // Fetch attachment if we have a rowData with ID
+        if (rowData.id) {
+          fetchAttachment(rowData.id);
+        }
+      }
+    }, [rowData, user.token]);
+    
+    // Function to fetch the attachment
+    const fetchAttachment = async (requestId) => {
+      try {
+        setIsLoadingAttachment(true);
+        const response = await getAttachment(user.token, requestId);
+        if (response.data && response.data.length > 0) {
+          setAttachment(response.data[0]); // Get the first attachment
+        } else {
+          setAttachment(null);
+        }
+      } catch (error) {
+        console.error('Error fetching attachment:', error);
+        setAttachment(null);
+      } finally {
+        setIsLoadingAttachment(false);
+      }
+    };
+  
+    // Handle form submission - only handle approve/reject actions
+    const handleSubmit = async (action) => {
+      try {
+        setIsSubmitting(true);
+        let response;
+        
+        if (action === 'approve') {
+          // Call the approve API endpoint
+          response = await approveRequest(rowData.id, user.token);
+          console.log('Approving request:', rowData.id);
+        } else if (action === 'reject') {
+          // Call the decline API endpoint
+          response = await declineRequest(rowData.id, user.token);
+          console.log('Rejecting request:', rowData.id);
         }
         
-        // Optional: Close the modal
-        // onClose();
-      }
-    } catch (error) {
-      console.error('Error updating leave request:', error);
-    } finally {
-      setIsSubmitting(false);
-    }
-  };
-
-  return (
-    <StyledModal
-      aria-labelledby="update-modal-title"
-      aria-describedby="update-modal-description"
-      open={open}
-      onClose={onClose}
-      slots={{ backdrop: StyledBackdrop }}
-    >
-      <ModalContent sx={{ width: 850 }}>
-        <Box sx={{
-          overflow: 'auto',
-          width: '100%',
-          height: '100%',
-          display: 'flex',
-          flexDirection: 'column',
-        }}>
-          <Box sx={{
-            backgroundColor: 'primary.main',
-            width: '100%',
-            padding: 2,
-            color: 'white',
-          }}>
-            <Typography variant='h6' sx={{ fontWeight: 'bold'}}>Leave Request Details</Typography>
-          </Box>
+        console.log('Response:', response);
+        
+        // If successful
+        if (response && response.status === 200) {
+          // Update the status locally 
+          setStatus(action === 'approve' ? 'APPROVED' : 'REJECTED');
           
+          // Call the success callback
+          if (onUpdateSuccess) {
+            onUpdateSuccess();
+          }
+        }
+      } catch (error) {
+        console.error('Error updating leave request:', error);
+      } finally {
+        setIsSubmitting(false);
+      }
+    };
+  
+    return (
+      <StyledModal
+        aria-labelledby="update-modal-title"
+        aria-describedby="update-modal-description"
+        open={open}
+        onClose={onClose}
+        slots={{ backdrop: StyledBackdrop }}
+      >
+        <ModalContent sx={{ width: 850 }}>
           <Box sx={{
+            overflow: 'auto',
             width: '100%',
-            padding: 2,
-            color: 'primary.main',
             height: '100%',
             display: 'flex',
             flexDirection: 'column',
           }}>
-            {/* Request Dates Section */}
-            <Box sx={{ 
-              mt: 2,
-              display: 'flex', 
+            <Box sx={{
+              backgroundColor: 'primary.main',
               width: '100%',
+              padding: 2,
+              color: 'white',
             }}>
-              <Box sx={{ width: '20%' }}>
-                <Typography variant='h6'>Request Dates</Typography>
+              <Typography variant='h6' sx={{ fontWeight: 'bold'}}>Leave Request Details</Typography>
+            </Box>
+            
+            <Box sx={{
+              width: '100%',
+              padding: 2,
+              color: 'primary.main',
+              height: '100%',
+              display: 'flex',
+              flexDirection: 'column',
+            }}>
+              {/* Request Dates Section */}
+              <Box sx={{ 
+                mt: 2,
+                display: 'flex', 
+                width: '100%',
+              }}>
+                <Box sx={{ width: '20%' }}>
+                  <Typography variant='h6'>Request Dates</Typography>
+                </Box>
+                <Box sx={{ width: '80%', display: 'flex', gap: 2 }}>
+                  <LocalizationProvider dateAdapter={AdapterDayjs}>
+                    <DemoContainer components={['DatePicker']} sx={{ width: '40%' }}>
+                      <DatePicker 
+                        label="From" 
+                        value={rowData?.startDate ? dayjs(rowData.startDate) : null}
+                        readOnly
+                      />
+                    </DemoContainer>
+                    <DemoContainer components={['DatePicker']} sx={{ width: '40%' }}>
+                      <DatePicker 
+                        label="To" 
+                        value={rowData?.endDate ? dayjs(rowData.endDate) : null}
+                        readOnly
+                      />
+                    </DemoContainer>
+                  </LocalizationProvider>
+                  <Box
+                    component="form"
+                    sx={{ '& > :not(style)': { m: 1 } }}
+                    noValidate
+                  >
+                    <TextField 
+                      id="filled-basic" 
+                      label="No of days" 
+                      variant="filled" 
+                      value={rowData?.days || (rowData?.endDate && rowData?.startDate ? 
+                        Math.ceil((new Date(rowData.endDate) - new Date(rowData.startDate)) / (1000 * 60 * 60 * 24)) + 1 : 
+                        0)}
+                      InputProps={{ readOnly: true }}
+                    />
+                  </Box>
+                </Box>
               </Box>
-              <Box sx={{ width: '80%', display: 'flex', gap: 2 }}>
-                <LocalizationProvider dateAdapter={AdapterDayjs}>
-                  <DemoContainer components={['DatePicker']} sx={{ width: '40%' }}>
-                    <DatePicker 
-                      label="From" 
-                      value={rowData?.startDate ? dayjs(rowData.startDate) : null}
-                      readOnly
-                    />
-                  </DemoContainer>
-                  <DemoContainer components={['DatePicker']} sx={{ width: '40%' }}>
-                    <DatePicker 
-                      label="To" 
-                      value={rowData?.endDate ? dayjs(rowData.endDate) : null}
-                      readOnly
-                    />
-                  </DemoContainer>
-                </LocalizationProvider>
+              
+              {/* Employee Section */}
+              <Box sx={{ 
+                mt: 2,
+                display: 'flex', 
+                width: '100%',
+              }}>
+                <Box sx={{ width: '20%' }}>
+                  <Typography variant='h6'>Employee</Typography>
+                </Box>
                 <Box
                   component="form"
-                  sx={{ '& > :not(style)': { m: 1 } }}
+                  sx={{
+                    width: '40%',
+                    '& .MuiTextField-root': { width: '100%' },
+                  }}
                   noValidate
                 >
                   <TextField 
-                    id="filled-basic" 
-                    label="No of days" 
-                    variant="filled" 
-                    value={rowData?.days || (rowData?.endDate && rowData?.startDate ? 
-                      Math.ceil((new Date(rowData.endDate) - new Date(rowData.startDate)) / (1000 * 60 * 60 * 24)) + 1 : 
-                      0)}
+                    id="outlined-basic" 
+                    variant="outlined" 
+                    value={rowData?.idUserSend || 'Unknown'}
                     InputProps={{ readOnly: true }}
                   />
                 </Box>
               </Box>
-            </Box>
-            
-            {/* Employee Section */}
-            <Box sx={{ 
-              mt: 2,
-              display: 'flex', 
-              width: '100%',
-            }}>
-              <Box sx={{ width: '20%' }}>
-                <Typography variant='h6'>Employee</Typography>
-              </Box>
-              <Box
-                component="form"
-                sx={{
-                  width: '40%',
-                  '& .MuiTextField-root': { width: '100%' },
-                }}
-                noValidate
-              >
-                <TextField 
-                  id="outlined-basic" 
-                  variant="outlined" 
-                  value={rowData?.idUserSend || 'Unknown'}
-                  InputProps={{ readOnly: true }}
-                />
-              </Box>
-            </Box>
-            
-            {/* Reason Section */}
-            <Box sx={{ 
-              mt: 2,
-              display: 'flex', 
-              width: '100%',
-            }}>
-              <Box sx={{ width: '20%' }}>
-                <Typography variant='h6'>Reason</Typography>
-              </Box>
-              <Box
-                component="form"
-                sx={{
-                  width: '80%',
-                  '& .MuiTextField-root': { width: '100%' },
-                }}
-                noValidate
-              >
-                <TextField
-                  id="outlined-multiline-reason"
-                  multiline
-                  maxRows={4}
-                  value={rowData?.reason || ''}
-                  InputProps={{ readOnly: true }}
-                />
-              </Box>
-            </Box>
-            
-            {/* Feedback Section - Only this can be edited when status is PENDING */}
-            {/* <Box sx={{ 
-              mt: 2,
-              display: 'flex', 
-              width: '100%',
-            }}>
-              <Box sx={{ width: '20%' }}>
-                <Typography variant='h6'>Feedback</Typography>
-              </Box>
-              <Box
-                component="form"
-                sx={{
-                  width: '80%',
-                  '& .MuiTextField-root': { width: '100%' },
-                }}
-                noValidate
-              >
-                <TextField
-                  id="outlined-multiline-feedback"
-                  multiline
-                  rows={4}
-                  value={feedback}
-                  onChange={(e) => setFeedback(e.target.value)}
-                  placeholder="Enter your feedback for this request"
-                  disabled={status !== 'PENDING'}
-                />
-              </Box>
-            </Box> */}
-
-            {/* Status Section */}
-            <Box sx={{ 
-              mt: 2,
-              display: 'flex', 
-              width: '100%',
-            }}>
-              <Box sx={{ width: '20%' }}>
-                <Typography variant='h6'>Status</Typography>
-              </Box>
-              <Box sx={{ width: '20%' }}>
-                <Typography 
-                  variant='subtitle1' 
-                  sx={{ 
-                    fontWeight: 'bold', 
-                    color: status === 'APPROVED' ? 'success.main' : 
-                           status === 'REJECTED' ? 'error.main' : 'warning.main'
+              
+              {/* Reason Section */}
+              <Box sx={{ 
+                mt: 2,
+                display: 'flex', 
+                width: '100%',
+              }}>
+                <Box sx={{ width: '20%' }}>
+                  <Typography variant='h6'>Reason</Typography>
+                </Box>
+                <Box
+                  component="form"
+                  sx={{
+                    width: '80%',
+                    '& .MuiTextField-root': { width: '100%' },
                   }}
+                  noValidate
                 >
-                  {status}
-                </Typography>
+                  <TextField
+                    id="outlined-multiline-reason"
+                    multiline
+                    maxRows={4}
+                    value={rowData?.reason || ''}
+                    InputProps={{ readOnly: true }}
+                  />
+                </Box>
+              </Box>
+              
+              {/* Attachment Section - New */}
+              {(attachment || isLoadingAttachment) && (
+                <Box sx={{ 
+                  mt: 2,
+                  display: 'flex', 
+                  width: '100%',
+                }}>
+                  <Box sx={{ width: '20%' }}>
+                    <Typography variant='h6'>Attachment</Typography>
+                  </Box>
+                  <Box sx={{ width: '80%' }}>
+                    {isLoadingAttachment ? (
+                      <Typography color="text.secondary">Loading attachment...</Typography>
+                    ) : attachment ? (
+                      <Box>
+                        {attachment.url.match(/\.(jpeg|jpg|gif|png)$/) ? (
+                          <Box
+                            component="img"
+                            src={attachment.url}
+                            alt="Attachment"
+                            sx={{
+                              maxWidth: 300,
+                              maxHeight: 200,
+                              objectFit: 'contain',
+                              borderRadius: 1,
+                              border: '1px solid #ddd',
+                              mt: 1
+                            }}
+                          />
+                        ) : (
+                          <Button 
+                            variant="outlined" 
+                            href={attachment.url} 
+                            target="_blank"
+                            startIcon={<CloudUploadIcon />}
+                            sx={{ mt: 1 }}
+                          >
+                            View Attachment
+                          </Button>
+                        )}
+                      </Box>
+                    ) : (
+                      <Typography color="text.secondary">No attachment found</Typography>
+                    )}
+                  </Box>
+                </Box>
+              )}
+  
+              {/* Status Section */}
+              <Box sx={{ 
+                mt: 2,
+                display: 'flex', 
+                width: '100%',
+              }}>
+                <Box sx={{ width: '20%' }}>
+                  <Typography variant='h6'>Status</Typography>
+                </Box>
+                <Box sx={{ width: '20%' }}>
+                  <Typography 
+                    variant='subtitle1' 
+                    sx={{ 
+                      fontWeight: 'bold', 
+                      color: status === 'APPROVED' ? 'success.main' : 
+                             status === 'REJECTED' ? 'error.main' : 'warning.main'
+                    }}
+                  >
+                    {status}
+                  </Typography>
+                </Box>
               </Box>
             </Box>
+            
+            {/* Action Buttons */}
+            <Box sx={{
+              width: '100%',
+              padding: 2,
+              backgroundColor: 'grey.200',
+              display: 'flex',
+              justifyContent: 'flex-end',
+              gap: 3
+            }}>
+              {user.role === 'admin' && status === 'PENDING' && (
+                <>
+                  <Button 
+                    variant="contained" 
+                    color="success" 
+                    onClick={() => handleSubmit('approve')}
+                    disabled={isSubmitting}
+                  >
+                    {isSubmitting ? 'Processing...' : 'Approve'}
+                  </Button>
+                  <Button 
+                    variant="contained" 
+                    color="error" 
+                    onClick={() => handleSubmit('reject')}
+                    disabled={isSubmitting}
+                  >
+                    {isSubmitting ? 'Processing...' : 'Reject'}
+                  </Button>
+                </>
+              )}
+              <Button variant="outlined" onClick={onClose}>Close</Button>
+            </Box>
           </Box>
-          
-          {/* Action Buttons */}
-          <Box sx={{
-            width: '100%',
-            padding: 2,
-            backgroundColor: 'grey.200',
-            display: 'flex',
-            justifyContent: 'flex-end',
-            gap: 3
-          }}>
-            {user.role === 'admin' && status === 'PENDING' && (
-              <>
-                <Button 
-                  variant="contained" 
-                  color="success" 
-                  onClick={() => handleSubmit('approve')}
-                  disabled={isSubmitting}
-                >
-                  {isSubmitting ? 'Processing...' : 'Approve'}
-                </Button>
-                <Button 
-                  variant="contained" 
-                  color="error" 
-                  onClick={() => handleSubmit('reject')}
-                  disabled={isSubmitting}
-                >
-                  {isSubmitting ? 'Processing...' : 'Reject'}
-                </Button>
-              </>
-            )}
-            <Button variant="outlined" onClick={onClose}>Close</Button>
-          </Box>
-        </Box>
-      </ModalContent>
-    </StyledModal>
-  );
-}
+        </ModalContent>
+      </StyledModal>
+    );
+  }
 
 ModalUpdate.propTypes = {
   rowData: PropTypes.object,
