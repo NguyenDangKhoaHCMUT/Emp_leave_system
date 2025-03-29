@@ -23,7 +23,7 @@ const VisuallyHiddenInput = styled('input')({
   width: 1,
 });
 
-function Content() {
+function Content({ onCancel }) {
   const [fileUrl, setFileUrl] = useState(null);
   const [isUploading, setIsUploading] = useState(false);
   
@@ -63,6 +63,28 @@ function Content() {
     reason: '',
     attachmentUrls: [fileUrl],
   });
+  
+  const resetForm = () => {
+    setFormData({
+      idUserReceive: 0,
+      leaveType: null,
+      startDate: null,
+      endDate: null,
+      reason: '',
+      attachmentUrls: [],
+    });
+    setFileUrl(null);
+  };
+
+  const handleCancel = React.useCallback(() => {
+    resetForm();
+    console.log("Cancel button clicked, executing onCancel");
+    if (typeof onCancel === 'function') {
+      onCancel();
+    } else {
+      console.error("onCancel is not a function");
+    }
+  }, [onCancel]);
 
   const handleApply = async () => {
     const token = user.token;
@@ -271,7 +293,15 @@ function Content() {
         <Button variant="contained" onClick={handleApply}>
           Apply
         </Button>
-        <Button variant="outlined">Cancel</Button>
+        {/* <Button 
+          variant="outlined" 
+          onClick={(e) => {
+            e.stopPropagation(); // Prevent event bubbling
+            handleCancel();
+          }}
+        >
+          Cancel
+        </Button> */}
       </Box>
     </Box>
   );

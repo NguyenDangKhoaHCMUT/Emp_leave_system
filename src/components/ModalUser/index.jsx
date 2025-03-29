@@ -6,10 +6,18 @@ import { Modal as BaseModal } from '@mui/base/Modal';
 import Content from './Content';
 import { red } from '@mui/material/colors';
 
-export default function index({ title}) {
+export default function ModalUser({ title }) {
   const [open, setOpen] = React.useState(false);
-  const handleOpen = () => setOpen(true);
-  const handleClose = () => setOpen(false);
+  
+  const handleOpen = () => {
+    console.log("Opening modal");
+    setOpen(true);
+  };
+  
+  const handleClose = React.useCallback(() => {
+    console.log("Closing modal");
+    setOpen(false);
+  }, []);
 
   return (
     <div>
@@ -23,8 +31,11 @@ export default function index({ title}) {
         onClose={handleClose}
         slots={{ backdrop: StyledBackdrop }}
       >
-        <ModalContent sx={{ width: 850 }}>
-          <Content />
+        <ModalContent 
+          sx={{ width: 850 }}
+          onClick={(e) => e.stopPropagation()} // Prevent closing when clicking on content
+        >
+          <Content onCancel={handleClose} />
         </ModalContent>
       </Modal>
     </div>
