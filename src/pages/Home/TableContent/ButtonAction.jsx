@@ -23,11 +23,11 @@ function ButtonAction({ status, id, refreshTable }) {
   } 
   return (
     <Box sx={{ display: 'flex', justifyContent: 'flex-end', gap: 1 }}>
-      <Button variant="text">
+      {/* <Button variant="text">
         <Tooltip title="Edit">
           <EditIcon />
         </Tooltip>
-      </Button>
+      </Button> */}
 
       <Button 
         variant="text"
