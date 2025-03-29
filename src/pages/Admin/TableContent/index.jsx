@@ -8,7 +8,7 @@ import TableHead from '@mui/material/TableHead';
 import TablePagination from '@mui/material/TablePagination';
 import TableRow from '@mui/material/TableRow';
 import { Button, Chip } from '@mui/material';
-import { getAllListRequest } from '~/services/apiService';
+import { getAllListRequests } from '~/services/apiService';
 import { useAuth } from '~/context/AuthContext';
 import ButtonAction from './ButtonAction';
 import ModalUpdate from './ModalUpdate';
@@ -52,7 +52,7 @@ export default function index() {
   React.useEffect(() => {
     const fetchData = async () => {
       try {
-        const response = await getAllListRequest(user.token);
+        const response = await getAllListRequests(user.token);
         setDatas(response.data);
       } catch (error) {
         console.error('Error fetching data:', error);
@@ -89,7 +89,7 @@ export default function index() {
     // Refresh data after successful update
     const fetchData = async () => {
       try {
-        const response = await getAllListRequest(user.token);
+        const response = await getAllListRequests(user.token);
         setDatas(response.data);
       } catch (error) {
         console.error('Error fetching data:', error);
