@@ -15,7 +15,16 @@ const getUserProfile = async (token) => {
     return response;
 }
 
+const getAllListRequest = async (token) => {
+    const response = await axios.get("/leave-requests", {
+        headers: {
+            Authorization: `Bearer ${token}`,
+        },
+    })
+}
+
 export { 
     postLogin,
-    getUserProfile
+    getUserProfile,
+    getAllListRequest
 };

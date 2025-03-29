@@ -7,6 +7,8 @@ import TableContainer from '@mui/material/TableContainer';
 import TableHead from '@mui/material/TableHead';
 import TablePagination from '@mui/material/TablePagination';
 import TableRow from '@mui/material/TableRow';
+import { getAllListRequest } from '~/services/apiService';
+import { useAuth } from '~/context/AuthContext';
 
 import ButtonAction from './ButtonAction';
 import Modal from '~/components/Modal';
@@ -39,19 +41,19 @@ function createData(from, to, days, status, reason, employee, details) {
 }
 
 const rows = [
-  createData('31 Dec 2024', '31 Dec 2024', 1, 'Pending', 'Sick', 'Admin', <Modal title={<ButtonAction />}/>),
-  createData('31 Dec 2024', '31 Dec 2024', 1, 'Reject', 'Sick', 'Admin', <Modal title={<ButtonAction />}/>),
-  createData('31 Dec 2024', '31 Dec 2024', 1, 'Approved', 'Sick', 'Admin', <Modal title={<ButtonAction />}/>),
-  createData('31 Dec 2024', '31 Dec 2024', 1, 'Pending', 'Sick', 'Admin', <Modal title={<ButtonAction />}/>),
-  createData('31 Dec 2024', '31 Dec 2024', 1, 'Pending', 'Sick', 'Admin', <Modal title={<ButtonAction />}/>),
-  createData('31 Dec 2024', '31 Dec 2024', 1, 'Pending', 'Sick', 'Admin', <Modal title={<ButtonAction />}/>),
-  createData('31 Dec 2024', '31 Dec 2024', 1, 'Pending', 'Sick', 'Admin', <Modal title={<ButtonAction />}/>),
+  createData('31 Dec 2024', '31 Dec 2024', 1, 'Pending', 'Sick', 'Admin', <Modal title={<ButtonAction />} />),
+  createData('31 Dec 2024', '31 Dec 2024', 1, 'Reject', 'Sick', 'Admin', <Modal title={<ButtonAction />} />),
+  createData('31 Dec 2024', '31 Dec 2024', 1, 'Approved', 'Sick', 'Admin', <Modal title={<ButtonAction />} />),
+  createData('31 Dec 2024', '31 Dec 2024', 1, 'Pending', 'Sick', 'Admin', <Modal title={<ButtonAction />} />),
+  createData('31 Dec 2024', '31 Dec 2024', 1, 'Pending', 'Sick', 'Admin', <Modal title={<ButtonAction />} />),
+  createData('31 Dec 2024', '31 Dec 2024', 1, 'Pending', 'Sick', 'Admin', <Modal title={<ButtonAction />} />),
+  createData('31 Dec 2024', '31 Dec 2024', 1, 'Pending', 'Sick', 'Admin', <Modal title={<ButtonAction />} />),
 ];
 
 export default function index() {
   const [page, setPage] = React.useState(0);
   const [rowsPerPage, setRowsPerPage] = React.useState(5);
-
+  const user = useAuth();
   const handleChangePage = (event, newPage) => {
     setPage(newPage);
   };
@@ -61,8 +63,26 @@ export default function index() {
     setPage(0);
   };
 
+  // React.useEffect(async () => {
+  //   getAllListRequest(user.token)
+  //     .then((res) => {
+  //       console.log(res);
+  //     })
+  //     .catch((err) => {
+  //       console.log(err);
+  //     })
+  // }, [])
+  const handleGetAllListRequest = async () => {
+    try {
+      const res = await getAllListRequest(user.token);
+      console.log(res);
+    } catch (err) {
+      console.log(err);
+    }
+  }
+  handleGetAllListRequest();
   return (
-    <Paper sx={{ 
+    <Paper sx={{
       width: '100%',
     }}>
       <TableContainer sx={{ maxHeight: '90%' }}>
