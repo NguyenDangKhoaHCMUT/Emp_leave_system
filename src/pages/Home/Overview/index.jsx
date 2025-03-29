@@ -11,8 +11,8 @@ import TableRow from '@mui/material/TableRow';
 const columns = [
   { id: 'year', label: 'Year', minWidth: 170 },
   { id: 'id1', label: '2025', minWidth: 170 },
-  { id: 'id2', label: '', minWidth: 50 },
-  { id: 'id3', label: '', minWidth: 170 },
+  { id: 'id2', label: 'Remaining Office Deductio', minWidth: 50 },
+  { id: 'id3', label: '12', minWidth: 170 },
 ];
 
 function createData(year, id1, id2, id3) {
@@ -20,7 +20,6 @@ function createData(year, id1, id2, id3) {
 }
 
 const rows = [
-  createData('Total Office Deduction', '12', 'Remail Office Deduction', '12'),
 ];
 function index() {
   const [page, setPage] = React.useState(0);

@@ -15,7 +15,7 @@ const getUserProfile = async (token) => {
     return response;
 }
 
-const getAllListRequest = async (token) => {
+const getAllLeaveRequests = async (token) => {
     const response = await axios.get("/leave-requests", {
         headers: {
             Authorization: `Bearer ${token}`,
@@ -42,10 +42,42 @@ const approveRequest = async (id, token) => {
     return response;
 }
 
+const createLeaveRequest = async (data, token) => {
+    try {
+        const response = await axios.post("/leave-requests", data, {
+            headers: {
+                Authorization: `Bearer ${token}`,
+            },
+        });
+        return response;
+    } catch (error) {
+        console.error("Error creating leave request:", error);
+        throw error;
+    }
+}
+
+const deleteLeaveRequest = async (token, id) => {
+    try {
+        const response = await axios.delete(`/leave-requests/${id}`, {
+            headers: {
+                Authorization: `Bearer ${token}`,
+            },
+        });
+        return response;
+    } catch (error) {
+        console.error("Error deleting leave request:", error);
+        throw error;
+    }
+    // console.log(id);
+}
+
 export {
     postLogin,
     getUserProfile,
-    getAllListRequest,
     declineRequest,
     approveRequest,
-};
+    getAllLeaveRequests,
+    createLeaveRequest,
+    deleteLeaveRequest
+}
+
