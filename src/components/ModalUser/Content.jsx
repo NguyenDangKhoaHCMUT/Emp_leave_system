@@ -1,5 +1,6 @@
 import Box from '@mui/material/Box'
 import { Typography, Button } from '@mui/material'
+import React, { useState } from 'react'
 import TextField from '@mui/material/TextField';
 import { DemoContainer } from '@mui/x-date-pickers/internals/demo';
 import { AdapterDayjs } from '@mui/x-date-pickers/AdapterDayjs';
@@ -21,6 +22,30 @@ const VisuallyHiddenInput = styled('input')({
 });
 
 function Content() {
+  const [fileUrl, setFileUrl] = useState(null);
+  const [isUploading, setIsUploading] = useState(false);
+  
+  const handleFileUpload = async (file) => {
+    setIsUploading(true);
+    const formData = new FormData();
+    formData.append('file', file);
+    formData.append('upload_preset', 'quiz_images');
+
+    try {
+      const response = await fetch('https://api.cloudinary.com/v1_1/dlt7xgvn9/image/upload', {
+        method: 'POST',
+        body: formData
+      });
+      const data = await response.json();
+      console.log('File uploaded successfully:', data);
+      setFileUrl(data.secure_url);
+    } catch (error) {
+      console.error('Error uploading file:', error);
+    } finally {
+      setIsUploading(false);
+    }
+  };
+
   return (
     <Box sx={{
       overflow: 'auto',
@@ -125,14 +150,36 @@ function Content() {
                 variant="contained"
                 tabIndex={-1}
                 startIcon={<CloudUploadIcon />}
+                disabled={isUploading}
               >
-                Upload files
+                {isUploading ? 'Uploading...' : 'Upload file'}
                 <VisuallyHiddenInput
                   type="file"
-                  onChange={(event) => console.log(event.target.files)}
-                  multiple
+                  onChange={(event) => handleFileUpload(event.target.files[0])}
+                  disabled={isUploading}
                 />
               </Button>
+              {isUploading && (
+                <Typography sx={{ mt: 1, color: 'text.secondary' }}>
+                  Uploading file...
+                </Typography>
+              )}
+              {fileUrl && !isUploading && (
+                <Box>
+                  <Box
+                    component="img"
+                    sx={{
+                      mt: 2,
+                      maxWidth: 300,
+                      maxHeight: 200,
+                      objectFit: 'contain',
+                      borderRadius: 1
+                    }}
+                    src={fileUrl}
+                    alt="Uploaded file preview"
+                  />
+                </Box>
+              )}
             </div>
           </Box>
         </Box>
