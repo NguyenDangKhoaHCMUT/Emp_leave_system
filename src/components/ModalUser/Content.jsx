@@ -29,14 +29,14 @@ function Content() {
   
   const handleFileUpload = async (file) => {
     setIsUploading(true);
-    const formData = new FormData();
-    formData.append('file', file);
-    formData.append('upload_preset', 'quiz_images');
+    const formData1 = new FormData();
+    formData1.append('file', file);
+    formData1.append('upload_preset', 'quiz_images');
 
     try {
       const response = await fetch('https://api.cloudinary.com/v1_1/dlt7xgvn9/image/upload', {
         method: 'POST',
-        body: formData
+        body: formData1
       });
       const data = await response.json();
       console.log('File uploaded successfully:', data);
@@ -45,6 +45,8 @@ function Content() {
       console.error('Error uploading file:', error);
     } finally {
       setIsUploading(false);
+    }
+  };
   const { user } = useAuth();
   const [formData, setFormData] = useState({
     startDate: null,
@@ -268,4 +270,5 @@ function Content() {
   );
 }
 
-export default Content;
+
+export default Content
