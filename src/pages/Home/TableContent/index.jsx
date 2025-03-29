@@ -46,7 +46,7 @@ export default function Index() {
             reason: item.reason,
             action: item.status === 'PENDING' ? <ButtonAction status={item.status} id={item.id} refreshTable={refreshTable} /> : null,
             };
-        });
+        }).reverse();
         setRows(data);
       } catch (error) {
         console.error('Error fetching leave requests:', error);
