@@ -75,17 +75,7 @@ function Content({ onCancel }) {
     });
     setFileUrl(null);
   };
-
-  const handleCancel = React.useCallback(() => {
-    resetForm();
-    console.log("Cancel button clicked, executing onCancel");
-    if (typeof onCancel === 'function') {
-      onCancel();
-    } else {
-      console.error("onCancel is not a function");
-    }
-  }, [onCancel]);
-
+  
   const handleApply = async () => {
     const token = user.token;
 
@@ -181,6 +171,17 @@ function Content({ onCancel }) {
                 id="filled-basic"
                 label="No of days"
                 variant="filled"
+                value={
+                  formData.startDate && formData.endDate
+                    ? Math.max(
+                        0,
+                        formData.endDate.diff(formData.startDate, 'day') + 1
+                      )
+                    : ''
+                }
+                InputProps={{
+                  readOnly: true,
+                }}
               />
             </Box>
           </Box>

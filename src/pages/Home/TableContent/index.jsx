@@ -65,6 +65,19 @@ export default function Index() {
     setPage(0);
   };
 
+  const getStatusStyle = (status) => {
+    switch (status) {
+      case 'PENDING':
+        return { color: 'orange', fontWeight: 'bold' };
+      case 'APPROVED':
+        return { color: 'green', fontWeight: 'bold' };
+      case 'DECLINED':
+        return { color: 'red', fontWeight: 'bold' };
+      default:
+        return {};
+    }
+  };
+
   return (
     <Paper sx={{ width: '100%' }}>
       <TableContainer sx={{ maxHeight: '90%' }}>
@@ -90,7 +103,11 @@ export default function Index() {
                   {columns.map((column) => {
                     const value = row[column.id];
                     return (
-                      <TableCell key={column.id} align={column.align}>
+                      <TableCell
+                        key={column.id}
+                        align={column.align}
+                        style={column.id === 'status' ? getStatusStyle(value) : {}}
+                      >
                         {value}
                       </TableCell>
                     );
