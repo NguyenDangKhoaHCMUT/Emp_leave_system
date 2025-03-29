@@ -38,14 +38,14 @@ export default function Index() {
         const token = user.token;
         const response = await getAllLeaveRequests(token);
         const data = response.data.map((item) => {
-          return {
+            return {
             from: item.startDate,
             to: item.endDate,
             days: Math.ceil((new Date(item.endDate) - new Date(item.startDate)) / (1000 * 60 * 60 * 24)),
             status: item.status,
             reason: item.reason,
-            action: <ButtonAction status={item.status} id={item.id} refreshTable={refreshTable} />,
-          };
+            action: item.status === 'PENDING' ? <ButtonAction status={item.status} id={item.id} refreshTable={refreshTable} /> : null,
+            };
         });
         setRows(data);
       } catch (error) {

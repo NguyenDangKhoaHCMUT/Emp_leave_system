@@ -40,7 +40,14 @@ function Content() {
       });
       const data = await response.json();
       console.log('File uploaded successfully:', data);
-      setFileUrl(data.secure_url);
+      const uploadedUrl = data.secure_url;
+      setFileUrl(uploadedUrl);
+      
+      // Update attachmentUrls in formData
+      setFormData(prevData => ({
+        ...prevData,
+        attachmentUrls: [...prevData.attachmentUrls.filter(url => url !== null), uploadedUrl]
+      }));
     } catch (error) {
       console.error('Error uploading file:', error);
     } finally {
@@ -49,10 +56,12 @@ function Content() {
   };
   const { user } = useAuth();
   const [formData, setFormData] = useState({
+    idUserReceive: 0,
+    leaveType: null,
     startDate: null,
     endDate: null,
     reason: '',
-    files: '',
+    attachmentUrls: [fileUrl],
   });
 
   const handleApply = async () => {
@@ -60,21 +69,19 @@ function Content() {
 
     try {
       const payload = {
+        idUserReceive: formData.idUserReceive,
+        leaveType: formData.leaveType,
         startDate: formData.startDate,
         endDate: formData.endDate,
         reason: formData.reason,
-        files: formData.files,
+        attachmentUrls: formData.attachmentUrls,
       };
 
-      const response = await createLeaveRequest(token, payload);
-      if (!response.ok) {
-        throw new Error('Network response was not ok');
-      }
-      const result = await response.json();
-      console.log('API Response:', result);
+      const response = createLeaveRequest(token, payload);
+      console.log('API Response:', response.data);
       alert('Leave applied successfully!');
     } catch (error) {
-      console.error('Error applying leave:', error);
+      console.error('Error applying leave:', error.response?.data || error.message);
       alert('Failed to apply leave.');
     }
   };
@@ -104,7 +111,7 @@ function Content() {
       <Box
         sx={{
           width: '100%',
-          padding: 2,
+          padding: 2, 
           color: 'primary.main',
           height: '100%',
           display: 'flex',
@@ -219,7 +226,7 @@ function Content() {
                 {isUploading ? 'Uploading...' : 'Upload file'}
                 <VisuallyHiddenInput
                   type="file"
-                  onChange={(event) => handleFileUpload(event.target.files[0])}
+                  onChange={(event) => event.target.files && handleFileUpload(event.target.files[0])}
                   disabled={isUploading}
                 />
               </Button>
