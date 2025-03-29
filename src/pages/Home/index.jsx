@@ -1,7 +1,7 @@
 import Box from '@mui/material/Box'
 import theme from '~/theme'
 import Overview from './Overview'
-import Modal from '~/components/Modal'
+import ModalUser from '~/components/ModalUser'
 import TableContent from './TableContent'
 function index() {
   return (
@@ -42,7 +42,7 @@ function index() {
           justifyContent: 'flex-end',
           alignItems: 'center'
         }}>
-          <Modal title={'Apply Leave'} />
+          <ModalUser title={'Apply Leave'} />
         </Box>
         <Box sx={{
           mt: 2,
