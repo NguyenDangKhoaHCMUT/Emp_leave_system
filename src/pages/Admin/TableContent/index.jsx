@@ -90,7 +90,7 @@ export default function index() {
     const fetchData = async () => {
       try {
         const response = await getAllLeaveRequests(user.token);
-        setDatas(response.data);
+        setDatas(response.data.reverse());
       } catch (error) {
         console.error('Error fetching data:', error);
       }
