@@ -1,12 +1,46 @@
-import BoxOverview from "./BoxOverview";
-import Box from "@mui/material/Box";
-import React from "react";
+import React, { useEffect } from 'react';
+import { Box } from '@mui/material';
+import BoxOverview from './BoxOverview';
+import { getAllLeaveRequests } from '~/services/apiService';
+import { useAuth } from '~/context/AuthContext';
 
 function index() {
-  const [employees, setEmployees] = React.useState(100);
-  const [totalLeaveDay, setTotalLeaveDay] = React.useState(20);
-  const [requestDenied, setRequestDenied] = React.useState(100);
-  const [pendingLeaveRequests, setPendingLeaveRequests] = React.useState(100);
+  const [total, setTotal] = React.useState(0);
+  const [approve, setApprove] = React.useState(0);
+  const [requestDenied, setRequestDenied] = React.useState(0);
+  const [pendingLeaveRequests, setPendingLeaveRequests] = React.useState(0);
+  const { user } = useAuth();
+
+  // Fetch data and count different types of leave requests
+  useEffect(() => {
+    const fetchData = async () => {
+      try {
+        const response = await getAllLeaveRequests(user.token);
+        const leaveRequests = response.data;
+        
+        // Set total count
+        setTotal(leaveRequests.length);
+        
+        // Count by status
+        const approvedCount = leaveRequests.filter(request => 
+          request.status === 'APPROVED').length;
+        setApprove(approvedCount);
+        
+        const rejectedCount = leaveRequests.filter(request => 
+          request.status === 'DECLINED').length;
+        setRequestDenied(rejectedCount);
+        
+        const pendingCount = leaveRequests.filter(request => 
+          request.status === 'PENDING').length;
+        setPendingLeaveRequests(pendingCount);
+        
+      } catch (error) {
+        console.error('Error fetching leave requests:', error);
+      }
+    };
+    
+    fetchData();
+  }, [user.token]);
 
   return (
     <Box
@@ -17,18 +51,18 @@ function index() {
         padding: 2,
         gap: 2,
         width: "100%",
-        flexWrap: "wrap", // Sửa lỗi và thêm thuộc tính này
+        flexWrap: "wrap", 
       }}
     >
       <Box>
-        <BoxOverview number={employees} title="Employees" color="#D7F5E4" />
-      </Box>
-      <Box>
         <BoxOverview
-          number={totalLeaveDay}
+          number={total}
           title="Total Leave Day"
           color="#D7F5E4"
         />
+      </Box>
+      <Box>
+        <BoxOverview number={approve} title="Request Approved" color="#D7F5E4" />
       </Box>
       <Box>
         <BoxOverview

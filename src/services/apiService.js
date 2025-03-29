@@ -20,6 +20,24 @@ const getAllLeaveRequests = async (token) => {
         headers: {
             Authorization: `Bearer ${token}`,
         },
+    })
+    return response;
+}
+
+const declineRequest = async (id, token) => {
+    const response = await axios.post(`/leave-requests/${id}/decline`, null, {
+        headers: {
+            Authorization: `Bearer ${token}`,
+        },
+    });
+    return response;
+}
+
+const approveRequest = async (id, token) => {
+    const response = await axios.post(`/leave-requests/${id}/approve`, null, {
+        headers: {
+            Authorization: `Bearer ${token}`,
+        },
     });
     return response;
 }
@@ -48,10 +66,27 @@ const deleteLeaveRequest = async (token, id) => {
     // console.log(id);
 }
 
-export { 
+const getAttachment = async (token, id) => {
+    try {
+        const response = await axios.get(`/leave-requests/${id}/attachments`, {
+            headers: {
+                Authorization: `Bearer ${token}`,
+            },
+        });
+        return response;
+    } catch (error) {
+        console.error("Error getting attachment:", error);
+        throw error;
+    }
+}
+
+export {
     postLogin,
     getUserProfile,
+    declineRequest,
+    approveRequest,
     getAllLeaveRequests,
     createLeaveRequest,
-    deleteLeaveRequest, 
-};
+    deleteLeaveRequest,
+    getAttachment,
+}
