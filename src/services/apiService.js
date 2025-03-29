@@ -24,18 +24,13 @@ const getAllLeaveRequests = async (token) => {
     return response;
 }
 
-const createLeaveRequest = async (data, token) => {
-    try {
-        const response = await axios.post("/leave-requests", data, {
-            headers: {
-                Authorization: `Bearer ${token}`,
-            },
-        });
-        return response;
-    } catch (error) {
-        console.error("Error creating leave request:", error);
-        throw error;
-    }
+const createLeaveRequest = async (token, data) => {
+    const response = await axios.post("/leave-requests", data, {
+        headers: {
+            Authorization: `Bearer ${token}`,
+        },
+    });
+    return response;
 }
 
 const deleteLeaveRequest = async (token, id) => {
@@ -58,5 +53,5 @@ export {
     getUserProfile,
     getAllLeaveRequests,
     createLeaveRequest,
-    deleteLeaveRequest
+    deleteLeaveRequest, 
 };

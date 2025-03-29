@@ -68,12 +68,12 @@ function index() {
         gap: { xs: 2, sm: 3 }, // Increased gap between right elements
         ml: 'auto' // Push to the right
       }}>
-        <ModeSelect />
+        {/* <ModeSelect />
         <Tooltip title="Notifications">
           <Badge color="secondary" variant="dot" sx={{ cursor: 'pointer' }}>
             <NotificationsNoneIcon sx={{ color: 'primary.main' }}/>
           </Badge>
-        </Tooltip>
+        </Tooltip> */}
         <Profiles />
       </Box>
     </Box>

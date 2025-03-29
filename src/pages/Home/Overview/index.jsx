@@ -1,4 +1,4 @@
-import React from 'react'
+import React, { use } from 'react'
 import { Typography, Box } from '@mui/material'
 import Paper from '@mui/material/Paper';
 import Table from '@mui/material/Table';
@@ -7,32 +7,49 @@ import TableCell from '@mui/material/TableCell';
 import TableContainer from '@mui/material/TableContainer';
 import TableHead from '@mui/material/TableHead';
 import TableRow from '@mui/material/TableRow';
+import {getUserProfile} from '~/services/apiService'
+import { useAuth } from '~/context/AuthContext';
+import { useEffect, useState } from 'react';
 
-const columns = [
-  { id: 'year', label: 'Year', minWidth: 170 },
-  { id: 'id1', label: '2025', minWidth: 170 },
-  { id: 'id2', label: 'Remaining Office Deductio', minWidth: 50 },
-  { id: 'id3', label: '12', minWidth: 170 },
-];
 
-function createData(year, id1, id2, id3) {
-  return { year, id1, id2, id3 };
-}
+
 
 const rows = [
 ];
+
 function index() {
+
+  const {user} = useAuth()
+  const token = user.token
+
+  console.log(user)
+
   const [page, setPage] = React.useState(0);
   const [rowsPerPage, setRowsPerPage] = React.useState(10);
+  const [remainDay, setRemainDay] = useState(0)
 
-  const handleChangePage = (event, newPage) => {
-    setPage(newPage);
-  };
+  const columns = [
+    { id: 'year', label: 'Year', minWidth: 170 },
+    { id: 'id1', label: '2025', minWidth: 170 },
+    { id: 'id2', label: 'Remaining Office Deduction', minWidth: 50 },
+    { id: 'id3', label: `${remainDay}`, minWidth: 170 },
+  ];
 
-  const handleChangeRowsPerPage = (event) => {
-    setRowsPerPage(+event.target.value);
-    setPage(0);
-  };
+  useEffect(() => {
+    const fetchData = async () => {
+      try {
+        const response = await getUserProfile(token);
+        console.log('API Response:', response.data);
+        let remainDay1 = response.data.user.leaveDaysRemain;
+        setRemainDay(remainDay1)
+        console.log('remainDay:', remainDay1)
+      } catch (error) {
+        console.error('Error fetching data:', error.response?.data || error.message);
+      }
+    };
+    fetchData();
+  }, []);
+
   return (
     <Box sx={{
       padding: 2,
