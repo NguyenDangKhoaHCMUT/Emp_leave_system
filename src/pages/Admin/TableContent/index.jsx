@@ -28,7 +28,7 @@ const columns = [
 
 // Function to get status chip color
 const getStatusColor = (status) => {
-  switch(status) {
+  switch (status) {
     case 'APPROVED':
       return 'success';
     case 'REJECTED':
@@ -47,43 +47,43 @@ export default function index() {
   const [selectedRow, setSelectedRow] = React.useState(null);
   const [modalOpen, setModalOpen] = React.useState(false);
   const { user } = useAuth();
-  
+
   // Fetch data
   React.useEffect(() => {
     const fetchData = async () => {
       try {
         const response = await getAllLeaveRequests(user.token);
-        setDatas(response.data);
+        setDatas(response.data.reverse());
       } catch (error) {
         console.error('Error fetching data:', error);
       }
     };
     fetchData();
   }, [user.token]);
-  
+
   // Handle page change
   const handleChangePage = (event, newPage) => {
     setPage(newPage);
   };
-  
+
   // Handle rows per page change
   const handleChangeRowsPerPage = (event) => {
     setRowsPerPage(+event.target.value);
     setPage(0);
   };
-  
+
   // Handle opening the modal with row data
   const handleOpenModal = (rowData) => {
     setSelectedRow(rowData);
     setModalOpen(true);
   };
-  
+
   // Handle closing the modal
   const handleCloseModal = () => {
     setModalOpen(false);
     setSelectedRow(null);
   };
-  
+
   // Handle successful update
   const handleUpdateSuccess = () => {
     // Refresh data after successful update
@@ -125,8 +125,8 @@ export default function index() {
                     return (
                       <TableCell key={column.id} align={column.align}>
                         {column.id === 'details' ? (
-                          <Button 
-                            variant="text" 
+                          <Button
+                            variant="text"
                             onClick={() => handleOpenModal(data)}
                           >
                             <ButtonAction />

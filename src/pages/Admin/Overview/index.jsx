@@ -57,7 +57,7 @@ function index() {
       <Box>
         <BoxOverview
           number={total}
-          title="Total Leave Day"
+          title="Total Leave Requests"
           color="#D7F5E4"
         />
       </Box>
