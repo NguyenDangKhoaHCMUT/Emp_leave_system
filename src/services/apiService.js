@@ -21,9 +21,10 @@ const getAllListRequest = async (token) => {
             Authorization: `Bearer ${token}`,
         },
     })
+    return response;
 }
 
-export { 
+export {
     postLogin,
     getUserProfile,
     getAllListRequest
